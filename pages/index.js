@@ -1,37 +1,8 @@
+import { useState } from 'react'
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
-import { useEffect, useState, useRef } from 'react'
-
+import { useRouter } from 'next/router'
 import appConfig from '../config.json'
 
-
-function GlobalStyle() {
-  return (
-    <style global jsx>{`
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        list-style: none;
-      }
-      body {
-        font-family: 'Open Sans', sans-serif;
-      }
-      /* App fit Height */ 
-      html, body, #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */ 
-    `}</style>
-  );
-}
 
 function Title(props) {
   const Tag = props.tag || 'h1';
@@ -49,10 +20,28 @@ function Title(props) {
 
 export default function HomePage() {
   const [username, setUsername] = useState('');
-  const input = useRef(null)
+  const Router = useRouter()
+
+  const handleChangeUsername = async (e) => {
+    let header = new Headers()
+    header.append("Authorization", `token `)
+    var myInit = { method: 'GET',
+               headers: header,
+               mode: 'cors',
+               cache: 'default' };
+    setUsername(e.currentTarget.value)
+    try {
+      const data = await fetch(`https://api.github.com/users/${username}`, myInit)
+      let myBlob = await data.json()
+      console.log(myBlob)     
+      
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <>
-      <GlobalStyle />
       <Box
         styleSheet={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -79,6 +68,10 @@ export default function HomePage() {
           {/* Form */}
           <Box
             as="form"
+            onSubmit={(e) => {
+              e.preventDefault()
+              Router.push('/chat')
+            }}
             styleSheet={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
@@ -91,8 +84,7 @@ export default function HomePage() {
 
             <TextField
               value={username}
-              ref={input}
-              onChange={(e) => {setUsername(e.currentTarget.value)}}
+              onChange={handleChangeUsername}
               fullWidth
               textFieldColors={{
                 neutral: {
@@ -139,7 +131,8 @@ export default function HomePage() {
                 borderRadius: '50%',
                 marginBottom: '16px',
               }}
-              src={`https://github.com/${username}.png`}
+              
+              src={`https://github.com/${username.length > 2 ? username : ''}.png`}
             />
             <Text
               variant="body4"
@@ -150,7 +143,7 @@ export default function HomePage() {
                 borderRadius: '1000px'
               }}
             >
-              {username}
+              {`${username.length > 2 ? username : ''}`}
             </Text>
           </Box>
           {/* Photo Area */}
