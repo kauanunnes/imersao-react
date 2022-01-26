@@ -3,7 +3,6 @@ import { Box, Button, Text, TextField, Image } from '@skynexui/components';
 import { useRouter } from 'next/router'
 import appConfig from '../config.json'
 
-
 function Title(props) {
   const Tag = props.tag || 'h1';
   return (
@@ -11,7 +10,7 @@ function Title(props) {
       <Tag>{props.children}</Tag>
       <style jsx>{`
         ${Tag} {
-          color: ${appConfig.theme.colors.neutrals['100']}
+          color: ${appConfig.theme.colors.primary['main']}
         }
       `}</style>
     </>
@@ -21,51 +20,69 @@ function Title(props) {
 export default function HomePage() {
   const [username, setUsername] = useState('');
   const Router = useRouter()
+  const [userInfo, setUserInfo] = useState({
+    user: {},
+    loading: false
+  })
+  let timer;
 
-  const handleChangeUsername = async (e) => {
-    let header = new Headers()
-    header.append("Authorization", `token `)
-    var myInit = { method: 'GET',
-               headers: header,
-               mode: 'cors',
-               cache: 'default' };
-    setUsername(e.currentTarget.value)
-    try {
-      const data = await fetch(`https://api.github.com/users/${username}`, myInit)
-      let myBlob = await data.json()
-      console.log(myBlob)     
-      
-    } catch (error) {
-      console.log(error)
+  const requestUser = async (user) => {
+    if (username === '') {
+      setUserInfo({
+        loading: false,
+        user: {}
+      })
+      return
     }
+    try {
+      let header = new Headers()
+      header.append("Authorization", `token `)
+      var myInit = { method: 'GET',
+                 headers: header,
+                 mode: 'cors',
+                 cache: 'default' };
+  
+      const data = await fetch(`https://api.github.com/users/${user}`)
+      const json = await data.json()
+      if (json.message === 'Not found') {
+        setUserInfo({
+          loading: false,
+          user: {}
+        })
+        return
+      }
+      // console.log(json)
+      setUserInfo({
+        loading: false,
+        user: json
+      })      
+    } catch (error) {
+      // console.log(error)
+    }
+  }
+
+  const handleChangeUsername = (e) => {
+    setUsername(e.target.value)
+    requestUser(e.target.value)
   }
 
   return (
     <>
-      <Box
-        styleSheet={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          backgroundColor: appConfig.theme.colors.primary[500],
-          backgroundImage: 'url(https://trecobox.com.br/wp-content/uploads/2018/12/Capa-Sailor-Moon-Trecobox.jpg)',
-          backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
-        }}
-      >
-        <Box
+      <Box styleSheet={{
+        display: 'flex', justifyContent: 'space-between',
+        maxWidth: '100%',
+        maxHeight: '100vh',
+        backgroundColor: '#e5e5e5',
+        paddingRight: '20px'
+      }}>
+        <Image
           styleSheet={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexDirection: {
-              xs: 'column',
-              sm: 'row',
-            },
-            width: '100%', maxWidth: '700px',
-            borderRadius: '5px', padding: '32px', margin: '16px',
-            boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
-            backgroundColor: appConfig.theme.colors.neutrals[700],
+            maxWidth: '45%',
+            height: 'auto',
           }}
-        >
-          {/* Form */}
+                
+          src={`/images/photo.png`}
+        />
           <Box
             as="form"
             onSubmit={(e) => {
@@ -74,80 +91,62 @@ export default function HomePage() {
             }}
             styleSheet={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
+              width: '555px', textAlign: 'center', marginBottom: '32px', marginRight: '5%'
             }}
           >
-            <Title tag="h2">Welcome again!</Title>
-            <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
-              {appConfig.name}
+            <Title>welcome again!</Title>
+            <Image
+              styleSheet={{
+                borderRadius: "100%",
+                width: '150px',
+                marginBottom: '16px',
+                boxShadow: '5px 4px 0px rgba(229,25,85,0.59)'
+              }}
+                
+              src={`https://github.com/${username.length > 2 ? username : ''}.png`}
+            />
+            <Text styleSheet={{
+              backgroundColor: 'rgba(229, 25, 85, 0.32)',
+              padding: '5px 10px',
+              borderRadius: '9px',
+              fontFamily: "'Dongle', sans-serif",
+              fontSize: '20px'
+            }}>
+              {username}  {!userInfo.loading && userInfo.user.name ? ' | '+ userInfo.user.name : ''}
             </Text>
-
+            <label htmlFor='input' style={{alignSelf: 'flex-start', fontSize: '24px'}}>username:</label>
             <TextField
+              id="input"
+              onChange={(e) => handleChangeUsername(e)}
               value={username}
-              onChange={handleChangeUsername}
               fullWidth
+              placeholder='type your github username'
+              styleSheet={{
+                fontSize: '24px'
+              }}
               textFieldColors={{
                 neutral: {
-                  textColor: appConfig.theme.colors.neutrals[200],
-                  mainColor: appConfig.theme.colors.neutrals[900],
-                  mainColorHighlight: appConfig.theme.colors.primary[500],
-                  backgroundColor: appConfig.theme.colors.neutrals[800],
+                  textColor: appConfig.theme.colors.primary["main"],
+                  mainColor: appConfig.theme.colors.primary["main"],
+                  mainColorHighlight: appConfig.theme.colors.primary["main"],
+                  backgroundColor: '#e5e5e5',
                 },
               }}
             />
             <Button
               type='submit'
-              label='Sign in'
+              label='login'
               fullWidth
               buttonColors={{
                 contrastColor: appConfig.theme.colors.neutrals["000"],
-                mainColor: appConfig.theme.colors.primary[500],
+                mainColor:appConfig.theme.colors.primary["main"],
                 mainColorLight: appConfig.theme.colors.primary[400],
                 mainColorStrong: appConfig.theme.colors.primary[600],
               }}
             />
           </Box>
-          {/* Form */}
 
 
-          {/* Photo Area */}
-          <Box
-            styleSheet={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              maxWidth: '200px',
-              padding: '16px',
-              backgroundColor: appConfig.theme.colors.neutrals[800],
-              border: '1px solid',
-              borderColor: appConfig.theme.colors.neutrals[999],
-              borderRadius: '10px',
-              flex: 1,
-              minHeight: '240px',
-            }}
-          >
-            <Image
-              styleSheet={{
-                borderRadius: '50%',
-                marginBottom: '16px',
-              }}
-              
-              src={`https://github.com/${username.length > 2 ? username : ''}.png`}
-            />
-            <Text
-              variant="body4"
-              styleSheet={{
-                color: appConfig.theme.colors.neutrals[200],
-                backgroundColor: appConfig.theme.colors.neutrals[900],
-                padding: '3px 10px',
-                borderRadius: '1000px'
-              }}
-            >
-              {`${username.length > 2 ? username : ''}`}
-            </Text>
-          </Box>
-          {/* Photo Area */}
-        </Box>
       </Box>
     </>
   );
