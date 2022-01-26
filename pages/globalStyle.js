@@ -1,6 +1,7 @@
 export default function GlobalStyle() {
   return (
     <style global jsx>{`
+      @import url('https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap');
       * {
         margin: 0;
         padding: 0;
@@ -8,7 +9,7 @@ export default function GlobalStyle() {
         list-style: none;
       }
       body {
-        font-family: 'Open Sans', sans-serif;
+        font-family: 'Dongle', sans-serif;
       }
       /* App fit Height */ 
       html, body, #__next {
