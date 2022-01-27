@@ -36,7 +36,7 @@ export default function ChatPage() {
     const handleSendMessage = async (e, message) => {
       e.preventDefault()
       const fullMessage = {
-        message,
+        message: message,
         by: 'kauanunnes',
         created_at: new Date().toLocaleDateString()
       }

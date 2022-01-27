@@ -27,7 +27,7 @@ export default function MessageList(props) {
               overflow: 'auto'
           }}
       >
-          {messages.map(({message, id, by, created_at}) => {
+          {messages && messages.map(({message, id, by, created_at}) => {
             return (
             <Text
                 key={id}

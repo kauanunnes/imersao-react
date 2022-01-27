@@ -4,7 +4,6 @@ import appConfig from '../../config.json';
 
 
 function MessageItem({isSelected}) {
-  console.log(message)
   return (
     <Box styleSheet={{
       backgroundColor: appConfig.theme.colors.primary['050'],
