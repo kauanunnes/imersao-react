@@ -36,13 +36,13 @@ export default function HomePage() {
     }
     try {
       let header = new Headers()
-      header.append("Authorization", `token `)
+      header.append("Authorization", `token ${process.env.NEXT_PUBLIC_TOKEN_GITHUB}`)
       var myInit = { method: 'GET',
                  headers: header,
                  mode: 'cors',
                  cache: 'default' };
   
-      const data = await fetch(`https://api.github.com/users/${user}`)
+      const data = await fetch(`https://api.github.com/users/${user}`, myInit)
       const json = await data.json()
       if (json.message === 'Not found') {
         setUserInfo({
