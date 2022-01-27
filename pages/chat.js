@@ -1,23 +1,53 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React, { useState, useEffect } from 'react';
 import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js'
+import LoadingCat from './components/LoadingCat';
+import UserInfo from './components/UserInfo';
+
+const supabaseClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
 export default function ChatPage() {
     const [message, setMessage] = useState('')
-    const [messageList, setMessageList] = useState([])
+    const [messageList, setMessageList] = useState({
+        loading: false,
+        messages: []
+    })
+    useEffect(async () => {
+        setMessageList({
+            loading: true,
+            messages:  []
+        })
+        const {data} = await supabaseClient
+                            .from('messages')
+                            .select('*')
+                            .order('id', {
+                                ascending: false,
+                            });
+        setMessageList({
+            loading: false,
+            messages:  [...data]
+        })
+        
+    }, [])
 
-    const handleSendMessage = (e, newMessage) => {
+    const handleSendMessage = async (e, message) => {
       e.preventDefault()
-      console.log('aaa')
       const fullMessage = {
-        id: messageList.length + 1,
-        newMessage,
+        message,
         by: 'kauanunnes',
-        date: new Date().toLocaleDateString()
+        created_at: new Date().toLocaleDateString()
       }
-      setMessageList([fullMessage, ...messageList])
+      const {data} = await supabaseClient
+                        .from('messages')
+                        .insert([
+                            fullMessage
+                        ]);
+      setMessageList({
+          loading: false,
+          messages:  [data[0], ...messageList]
+      })
       setMessage('')
-      console.log(messageList);
     }
     
     return (
@@ -57,8 +87,13 @@ export default function ChatPage() {
                         padding: '16px',
                     }}
                 >
+                    {messageList.loading ? <LoadingCat /> : (
+                        <MessageList messages={{
+                            loading: messageList.loading,
+                            messageList: messageList.messages
+                        }} />
 
-                    <MessageList messages={messageList} />
+                    )}
                     <Box
                         as="form"
                         styleSheet={{
@@ -86,11 +121,12 @@ export default function ChatPage() {
                             }}
                         />
                         <Button
-                          label='send'
+                          iconName='telegram'
                           styleSheet={{
                             height: '60px',
-                            alignSelf: 'flex-start',
+                            alignSelf: 'center',
                             borderRadius: '35%',
+                            marginBottom: '10px'
                           }}
                           buttonColors={{
                             contrastColor: appConfig.theme.colors.neutrals["000"],
@@ -134,8 +170,12 @@ function Header() {
 }
 
 function MessageList(props) {
-    const messageList = props.messages
+    const {loading, messageList} = props.messages
     const [messages, setMessages] = useState(messageList)
+    const [showInfo, setShowInfo] = useState({
+        id: -1,
+        situation: false
+    })    
     useEffect(() => {
       setMessages(messageList)
     }, [messageList])
@@ -152,7 +192,7 @@ function MessageList(props) {
                 overflow: 'auto'
             }}
         >
-            {messages.map(({newMessage, id, by, date}) => {
+            {messages.map(({message, id, by, created_at}) => {
               return (
               <Text
                   key={id}
@@ -160,8 +200,8 @@ function MessageList(props) {
                   onClick={() => {
                     const confirmAction = window.confirm('Are you sure about delete this message?')
                     if (!confirmAction) return
-                    const position = messages.findIndex((message) => {
-                      return id === message.id
+                    const position = messages.findIndex((value) => {
+                      return id === value.id
                     })
                     let newMessages = messages
                     newMessages.splice(position, 1)
@@ -194,9 +234,23 @@ function MessageList(props) {
                               borderRadius: '50%',
                               display: 'inline-block',
                               marginRight: '8px',
+                              hover: {
+                                  transform: 'scale(1.1)'
+                              }
                           }}
-                          src={`https://github.com/kauanunnes.png`}
+                          src={`https://github.com/${by}.png`}
+                          onMouseOver={() => setShowInfo({
+                            situation: true,
+                            id
+                          })}
+                          onMouseOut={() =>setShowInfo({
+                            situation: false,
+                            id: -1
+                          })}
                       />
+                      {showInfo.situation === true && showInfo.id === id ? (
+                          <UserInfo username={by}/>
+                      ) : ''}
                       <Text tag="strong" styleSheet={{
                         color: `${appConfig.theme.colors.primary[600]}`,
                         fontWeight: 'bold',
@@ -211,10 +265,10 @@ function MessageList(props) {
                           }}
                           tag="span"
                       >
-                          {date}
+                          {new Date(created_at).toLocaleString()}
                       </Text>
                   </Box>
-                  {newMessage}
+                  {message}
                   {/* <Button 
                     label="X"
                     onClick={(e) => {

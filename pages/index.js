@@ -70,9 +70,10 @@ export default function HomePage() {
     <>
       <Box styleSheet={{
         display: 'flex', justifyContent: 'space-between',
+        gap: '20px',
         maxWidth: '100%',
         maxHeight: '100vh',
-        backgroundColor: '#e5e5e5',
+        backgroundColor: `${appConfig.theme.colors.primary['050']}`,
         paddingRight: '20px'
       }}>
         <Image
@@ -83,7 +84,13 @@ export default function HomePage() {
                 
           src={`/images/photo.png`}
         />
-          <Box
+        <Box styleSheet={{
+          display: 'flex',
+          width: '55%',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+        <Box
             as="form"
             onSubmit={(e) => {
               e.preventDefault()
@@ -91,7 +98,11 @@ export default function HomePage() {
             }}
             styleSheet={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-              width: '555px', textAlign: 'center', marginBottom: '32px', marginRight: '5%'
+              width: '50%', textAlign: 'center', marginBottom: '32px',padding: '25px 35px', borderRadius: '12px',
+              border: '1px solid #E51955',
+              maxHeight: '450px',
+              backgroundColor: appConfig.theme.colors.primary['050'],
+              boxShadow: '-15px 13px 42px rgba(229, 25, 85, 0.18)',
             }}
           >
             <Title>welcome again!</Title>
@@ -105,15 +116,17 @@ export default function HomePage() {
                 
               src={`https://github.com/${username.length > 2 ? username : ''}.png`}
             />
-            <Text styleSheet={{
-              backgroundColor: 'rgba(229, 25, 85, 0.32)',
-              padding: '5px 10px',
-              borderRadius: '9px',
-              fontFamily: "'Dongle', sans-serif",
-              fontSize: '20px'
-            }}>
-              {username}  {!userInfo.loading && userInfo.user.name ? ' | '+ userInfo.user.name : ''}
-            </Text>
+            {username && (
+              <Text styleSheet={{
+                backgroundColor: 'rgba(229, 25, 85, 0.32)',
+                padding: '5px 10px',
+                borderRadius: '9px',
+                fontFamily: "'Dongle', sans-serif",
+                fontSize: '20px'
+              }}>
+                {username}  {!userInfo.loading && userInfo.user.name ? ' | '+ userInfo.user.name : ''}
+              </Text>
+            )}
             <label htmlFor='input' style={{alignSelf: 'flex-start', fontSize: '24px'}}>username:</label>
             <TextField
               id="input"
@@ -122,14 +135,16 @@ export default function HomePage() {
               fullWidth
               placeholder='type your github username'
               styleSheet={{
-                fontSize: '24px'
+                fontSize: '24px',
+                borderRadius: '20px',
+                height: '45px',
               }}
               textFieldColors={{
                 neutral: {
                   textColor: appConfig.theme.colors.primary["main"],
                   mainColor: appConfig.theme.colors.primary["main"],
                   mainColorHighlight: appConfig.theme.colors.primary["main"],
-                  backgroundColor: '#e5e5e5',
+                  backgroundColor: appConfig.theme.colors.primary['050'],
                 },
               }}
             />
@@ -137,6 +152,11 @@ export default function HomePage() {
               type='submit'
               label='login'
               fullWidth
+              styleSheet={{
+                borderRadius: '14px',
+                height: '45px',
+                
+              }}
               buttonColors={{
                 contrastColor: appConfig.theme.colors.neutrals["000"],
                 mainColor:appConfig.theme.colors.primary["main"],
@@ -145,6 +165,8 @@ export default function HomePage() {
               }}
             />
           </Box>
+
+        </Box>
 
 
       </Box>
