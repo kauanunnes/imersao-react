@@ -108,11 +108,10 @@ export default function ChatPage() {
                         padding: '16px',
                     }}
                 >
-                    {messageList.loading ? <LoadingCat /> : (
-                        <MessageList messages={{
+                    {!messageList.loading && messageList.messages ?<MessageList messages={{
                             messageList: messageList.messages
-                        }} />
-
+                        }} /> : (
+                            <LoadingCat />
                     )}
                     <Box
                         as="form"
