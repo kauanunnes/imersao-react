@@ -100,6 +100,7 @@ export default function ChatPage() {
                         message: 'Bring me a pen'
                     }} isSelected={false} />
                 </Box>
+                
                 <Box
                     styleSheet={{
                         position: 'relative',
