@@ -3,7 +3,7 @@ import { Box, Text, Button, Image } from '@skynexui/components';
 import appConfig from '../../config.json';
 
 
-function MessageItem({message, isSelected}) {
+function MessageItem({isSelected}) {
   console.log(message)
   return (
     <Box styleSheet={{
@@ -23,7 +23,7 @@ function MessageItem({message, isSelected}) {
         height: '70px',
         width: 'auto',
         borderRadius: '100%'
-      }} src={`https://www.github.com/${message.by}.png`}/>
+      }} src={`https://www.github.com/kauanunnes.png`}/>
       <Box styleSheet={{
         display: 'flex',
         flexDirection: 'column',
@@ -32,13 +32,13 @@ function MessageItem({message, isSelected}) {
           fontFamily: '"Dongle", sans-serif',
           fontSize: '20px',
           fontWeight: 'bold'
-        }}>@{message.by}</Text>
+        }}>@kauanunnes</Text>
         <Text styleSheet={{
           fontFamily: '"Dongle", sans-serif',
           fontSize: '18px',
           margin: '0'
 
-        }}>{message.message}</Text>
+        }}>this is a test</Text>
       </Box>
     </Box>
   );

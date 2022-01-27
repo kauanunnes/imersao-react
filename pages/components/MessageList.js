@@ -5,7 +5,7 @@ import UserInfo from './UserInfo';
 
 
 export default function MessageList(props) {
-  const {loading, messageList} = props.messages
+  const messageList = props.messages
   const [messages, setMessages] = useState(messageList)
   const [showInfo, setShowInfo] = useState({
       id: -1,

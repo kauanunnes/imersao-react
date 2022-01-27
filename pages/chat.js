@@ -91,16 +91,10 @@ export default function ChatPage() {
                     padding: '10px 0',
                     gap: '15px'
                 }}>
-                    <MessageItem message={{
-                        by: 'kauanunnes',
-                        message: 'where are you?'
-                    }} isSelected />
-                    <MessageItem message={{
-                        by: 'kauanunnes',
-                        message: 'Bring me a pen'
-                    }} isSelected={false} />
+                    <MessageItem isSelected />
+                    <MessageItem isSelected={false} />
                 </Box>
-                
+
                 <Box
                     styleSheet={{
                         position: 'relative',
@@ -116,7 +110,6 @@ export default function ChatPage() {
                 >
                     {messageList.loading ? <LoadingCat /> : (
                         <MessageList messages={{
-                            loading: messageList.loading,
                             messageList: messageList.messages
                         }} />
 
