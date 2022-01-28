@@ -11,45 +11,39 @@ const supabaseClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, proces
 
 export default function ChatPage() {
     const [message, setMessage] = useState('')
-    const [messageList, setMessageList] = useState({
-        loading: false,
-        messages: []
-    })
+    const [messageList, setMessageList] = useState(null)
+    const [loading, setLoading] = useState(null)
     useEffect(async () => {
-        setMessageList({
-            loading: true,
-            messages:  []
-        })
+        setLoading(true)
         const {data} = await supabaseClient
                             .from('messages')
                             .select('*')
                             .order('id', {
                                 ascending: false,
                             });
-        setMessageList({
-            loading: false,
-            messages:  [...data]
-        })
+        setMessageList(data)
+        setLoading(false)
         
     }, [])
 
     const handleSendMessage = async (e, message) => {
-      e.preventDefault()
-      const fullMessage = {
-        message,
-        by: 'kauanunnes',
-        created_at: new Date().toLocaleDateString()
-      }
-      const {data} = await supabaseClient
+        e.preventDefault()
+
+
+        const fullMessage = {
+            message,
+            by: 'kauanunnes',
+            created_at: new Date().toLocaleDateString()
+        }
+        const {data} = await supabaseClient
                         .from('messages')
                         .insert([
                             fullMessage
                         ]);
-      setMessageList({
-          loading: false,
-          messages:  [data[0], ...messageList]
-      })
-      setMessage('')
+        setMessageList([data[0], ...messageList])
+        
+        
+        setMessage('')
     }
     
     return (
@@ -108,8 +102,8 @@ export default function ChatPage() {
                         padding: '16px',
                     }}
                 >
-                    {!messageList.loading && messageList.messages ?<MessageList messages={{
-                            messageList: messageList.messages
+                    {!loading && messageList ?<MessageList messages={{
+                            messageList: messageList
                         }} /> : (
                             <LoadingCat />
                     )}
