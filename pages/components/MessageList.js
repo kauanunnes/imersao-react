@@ -6,14 +6,15 @@ import UserInfo from './UserInfo';
 
 export default function MessageList(props) {
   const messageList = props.messages
-  const [messages, setMessages] = useState(messageList)
+  const [messages, setMessages] = useState(null)
   const [showInfo, setShowInfo] = useState({
       id: -1,
       situation: false
   })    
   useEffect(() => {
-    setMessages(messageList)
-    console.log(messageList)
+    if (messageList) {
+      setMessages(messageList)
+    }
   }, [messageList])
   return (
       <Box
