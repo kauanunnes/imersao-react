@@ -5,6 +5,7 @@ import UserInfo from './UserInfo';
 
 
 export default function MessageList(props) {
+  
   const messageList = props.messages
   const [messages, setMessages] = useState(null)
   const [showInfo, setShowInfo] = useState({
@@ -13,7 +14,7 @@ export default function MessageList(props) {
   })    
   useEffect(() => {
     if (messageList) {
-      setMessages(messageList)
+      setMessages(messageList.messageList)
     }
   }, [messageList])
   return (
@@ -29,6 +30,9 @@ export default function MessageList(props) {
               overflow: 'auto'
           }}
       >
+        {/* <button onClick={() => {
+          console.log(messages)
+        }}>aaa</button> */}
           {messages && messages.map(({message, id, by, created_at}) => {
             return (
             <Text
@@ -106,21 +110,7 @@ export default function MessageList(props) {
                     </Text>
                 </Box>
                 {message}
-                {/* <Button 
-                  label="X"
-                  onClick={(e) => {
-                    const position = messages.findIndex((message) => {
-                      return id === message.id
-                    })
-                    let newMessages = messages
-                    newMessages.splice(position, 1)
-                    setMessages([...newMessages])
-
-                  }}
-                  styleSheet={{
-                    alignSelf:"flex-end",
-                  }}
-                /> */}
+                
             </Text>
             )
           })
