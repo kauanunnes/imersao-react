@@ -52,7 +52,8 @@ export default function ChatPage() {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               backgroundColor: `${appConfig.theme.colors.primary['050']}`,
               backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
-              color: appConfig.theme.colors.neutrals['000']
+              color: appConfig.theme.colors.neutrals['000'],
+              overflowY: 'hidden'
           }}
         >
             <Box
@@ -75,7 +76,7 @@ export default function ChatPage() {
                     gap: '15px'
                 }}>
                 <Box styleSheet={{
-                    height: '98%',
+                    height: '85%',
                     width: '20%',
                     backgroundColor: '#FFDEE8',
                     borderRadius: '5px',
@@ -94,7 +95,7 @@ export default function ChatPage() {
                         position: 'relative',
                         display: 'flex',
                         flex: 1,
-                        height: '98%',
+                        height: '85%',
                         backgroundColor: '#FFDEE8',
                         flexDirection: 'column',
                         justifyContent: 'flex-end',
