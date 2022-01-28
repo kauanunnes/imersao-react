@@ -5,13 +5,14 @@ import UserInfo from './UserInfo';
 
 
 export default function MessageList(props) {
-  
   const messageList = props.messages
   const [messages, setMessages] = useState(null)
   const [showInfo, setShowInfo] = useState({
       id: -1,
       situation: false
   })    
+  
+  
   useEffect(() => {
     if (messageList) {
       setMessages(messageList.messageList)
@@ -21,18 +22,18 @@ export default function MessageList(props) {
       <Box
           tag="ul"
           styleSheet={{
-              overflow: 'scroll',
               display: 'flex',
               flexDirection: 'column-reverse',
               flex: 1,
               color: appConfig.theme.colors.neutrals["000"],
               marginBottom: '16px',
-              overflow: 'auto'
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              maxWidth: '75vw',
+
           }}
       >
-        {/* <button onClick={() => {
-          console.log(messages)
-        }}>aaa</button> */}
+
           {messages && messages.map(({message, id, by, created_at}) => {
             return (
             <Text
@@ -44,6 +45,7 @@ export default function MessageList(props) {
                   const position = messages.findIndex((value) => {
                     return id === value.id
                   })
+                  props.handleDeleteMessage(id)
                   let newMessages = messages
                   newMessages.splice(position, 1)
                   setMessages([...newMessages])
@@ -57,7 +59,8 @@ export default function MessageList(props) {
                         backgroundColor: appConfig.theme.colors.primary['300'],
                     },
                     transition: 'all 0.15s',
-                    width: '100%',
+                    width: '97%',
+                    maxWidth: '75vw',
                     display: 'flex',
                     flexDirection: 'column',
                     color: `${appConfig.theme.colors.primary[600]}`,
@@ -109,7 +112,12 @@ export default function MessageList(props) {
                         {new Date(created_at).toLocaleString()}
                     </Text>
                 </Box>
-                {message}
+                {message.startsWith(':sticker:') ? (
+                  <Image styleSheet={{
+                    width: '65px',
+                    height: '65px'
+                  }} src={message.replace(':sticker:', '')} />
+                ) : message} 
                 
             </Text>
             )

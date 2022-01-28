@@ -1,18 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Text, TextField, Image, Button } from '@skynexui/components';
+import { Box, TextField, Button } from '@skynexui/components';
 import appConfig from '../config.json';
 import { createClient } from '@supabase/supabase-js'
-import LoadingCat from './components/LoadingCat';
-import Header from './components/Header';
-import MessageList from './components/MessageList';
-import MessageItem from './components/MessageItem';
+import LoadingCat from '../src/components/LoadingCat';
+import Header from '../src/components/Header';
+import MessageList from '../src/components/MessageList';
+import MessageItem from '../src/components/MessageItem';
+import { ButtonSendSticker } from '../src/components/SendSticker';
 
 const supabaseClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
+function listenerMessagesRealTime(addNewMessage) {
+    return supabaseClient
+            .from('messages')
+            .on('INSERT', (response) => {
+                addNewMessage(response.new)
+            })
+            .subscribe()
+
+}
+
 export default function ChatPage() {
     const [message, setMessage] = useState('')
-    const [messageList, setMessageList] = useState(null)
+    const [messageList, setMessageList] = useState([])
     const [loading, setLoading] = useState(null)
+    const [loggedUser, setLoggedUser] = React.useState(null)
+
+    const handleDeleteMessage = async (id) => {
+        try {
+            await supabaseClient.from('messages').delete().match({ id })
+
+        } catch (error) {
+            console.log(error)
+        } 
+    }
+
     useEffect(async () => {
         setLoading(true)
         const {data} = await supabaseClient
@@ -23,25 +45,25 @@ export default function ChatPage() {
                             });
         setMessageList(data)
         setLoading(false)
-        
+        setLoggedUser(JSON.parse(localStorage.getItem('username')))
+        listenerMessagesRealTime((newMessage) => {
+            console.log(newMessage)
+            setMessageList((currentValueOfList) => { return [newMessage, ...currentValueOfList]})
+    })
     }, [])
 
-    const handleSendMessage = async (e, message) => {
-        e.preventDefault()
-
-
+    const handleSendMessage = async (message) => {
         const fullMessage = {
             message,
-            by: 'kauanunnes',
+            by: loggedUser,
             created_at: new Date().toLocaleDateString()
         }
+
         const {data} = await supabaseClient
                         .from('messages')
                         .insert([
                             fullMessage
                         ]);
-        setMessageList([data[0], ...messageList])
-        
         
         setMessage('')
     }
@@ -73,10 +95,12 @@ export default function ChatPage() {
                 <Header headerTitle="Chat" />
                 <Box styleSheet={{
                     display: 'flex',
-                    gap: '15px'
+                    gap: '15px',
+                    height: '100%'
                 }}>
                 <Box styleSheet={{
-                    height: '85%',
+                    minHeight: '90%',
+                    maxHeight: '80vh',
                     width: '20%',
                     backgroundColor: '#FFDEE8',
                     borderRadius: '5px',
@@ -95,7 +119,9 @@ export default function ChatPage() {
                         position: 'relative',
                         display: 'flex',
                         flex: 1,
-                        height: '85%',
+                        minHeight: '90%',
+                        maxHeight: '80vh',
+                        maxWidth: '75vw',
                         backgroundColor: '#FFDEE8',
                         flexDirection: 'column',
                         justifyContent: 'flex-end',
@@ -103,7 +129,7 @@ export default function ChatPage() {
                         padding: '16px',
                     }}
                 >
-                    {!loading && messageList ?<MessageList messages={{
+                    {!loading && messageList ?<MessageList handleDeleteMessage={handleDeleteMessage} messages={{
                             messageList: messageList
                         }} /> : (
                             <LoadingCat />
@@ -114,13 +140,22 @@ export default function ChatPage() {
                             display: 'flex',
                             alignItems: 'center',
                         }}
-                        onSubmit={(e) => handleSendMessage(e, message)}
+                        onSubmit={(e) => {
+                            e.preventDefault()
+                            handleSendMessage(message)
+                        }}
                     >
                         <TextField
-                            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage(e, message)}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    handleSendMessage(message)
+                                }
+                            }}
                             onChange={e => setMessage(e.currentTarget.value)}
                             value={message}
                             placeholder="Type your message here"
+                            stateNode
                             type="textarea"
                             styleSheet={{
                                 width: '100%',
@@ -134,22 +169,37 @@ export default function ChatPage() {
                                 fontSize: '18px'
                             }}
                         />
-                        <Button
-                          iconName='telegram'
-                          styleSheet={{
-                            height: '60px',
-                            alignSelf: 'center',
-                            borderRadius: '35%',
-                            marginBottom: '10px'
-                          }}
-                          buttonColors={{
-                            contrastColor: appConfig.theme.colors.neutrals["000"],
-                            mainColor:appConfig.theme.colors.primary["main"],
-                            mainColorLight: appConfig.theme.colors.primary[400],
-                            mainColorStrong: appConfig.theme.colors.primary[600],
-                          }}
-                          onClick={(e) => handleSendMessage(e, message)}
-                        />
+                        <Box styleSheet={{
+                            width: '120px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            gap: '10px'
+                        }}>
+                            <Button
+                            iconName='telegram'
+                            styleSheet={{
+                                height: '60px',
+                                width: '60px',
+                                alignSelf: 'center',
+                                borderRadius: '60px',
+                                marginBottom: '10px'
+                            }}
+                            buttonColors={{
+                                contrastColor: appConfig.theme.colors.neutrals["000"],
+                                mainColor:appConfig.theme.colors.primary["main"],
+                                mainColorLight: appConfig.theme.colors.primary[400],
+                                mainColorStrong: appConfig.theme.colors.primary[600],
+                            }}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                handleSendMessage(message)
+                            }}
+                            />
+                            <ButtonSendSticker onStickerClick={(sticker) => {
+                                console.log(sticker)
+                                handleSendMessage(`:sticker:${sticker}`)
+                            }}/>
+                        </Box>
                     </Box>
                 </Box>
                 </Box>

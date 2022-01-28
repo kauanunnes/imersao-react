@@ -57,7 +57,7 @@ export default function HomePage() {
         user: json
       })      
     } catch (error) {
-      // console.log(error)
+      console.log(error)
     }
   }
 
@@ -94,6 +94,7 @@ export default function HomePage() {
             as="form"
             onSubmit={(e) => {
               e.preventDefault()
+              localStorage.setItem('username', JSON.stringify(username))
               Router.push('/chat')
             }}
             styleSheet={{

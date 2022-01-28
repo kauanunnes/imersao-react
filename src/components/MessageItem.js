@@ -16,10 +16,12 @@ function MessageItem({isSelected}) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: '15px'
+      gap: '15px',
+      padding: '0 20px'
     }}>
       <Image styleSheet={{
-        height: '70px',
+        height: '60%',
+        maxHeight: '70px',
         width: 'auto',
         borderRadius: '100%'
       }} src={`https://www.github.com/kauanunnes.png`}/>
